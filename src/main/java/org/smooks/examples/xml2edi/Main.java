@@ -42,12 +42,11 @@
  */
 package org.smooks.examples.xml2edi;
 
-import org.smooks.Smooks;
-import org.smooks.SmooksException;
-import org.smooks.container.ExecutionContext;
-import org.smooks.event.report.HtmlReportGenerator;
-import org.smooks.io.StreamUtils;
-import org.smooks.payload.StringResult;
+import org.smooks.*;
+
+import org.smooks.api.*;
+import org.smooks.io.payload.*;
+import org.smooks.support.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.stream.StreamSource;
@@ -71,16 +70,10 @@ public class Main {
         Smooks smooks = new Smooks("smooks-config.xml");
         try {
              // Create an exec context - no profiles....
-            ExecutionContext executionContext = smooks.createExecutionContext();
-
             StringResult result = new StringResult();
 
-            // Configure the execution context to generate a report...
-            executionContext.setEventListener(new HtmlReportGenerator("target/report/report.html"));
-
-            // Filter the input message to the outputWriter, using the execution context...
-            smooks.filterSource(executionContext, new StreamSource(new ByteArrayInputStream(messageIn)), result);
-
+            smooks.setFilterSettings(FilterSettings.newSaxNgSettings().setDefaultSerializationOn(false));
+            smooks.filterSource(new StreamSource(new ByteArrayInputStream(messageIn)), result);
             Locale.setDefault(defaultLocale);
 
             return result.getResult();
